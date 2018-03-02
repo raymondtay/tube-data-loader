@@ -16,6 +16,8 @@ val users = genUsers(team).sample.get
 
 val channels = genChannels(users).sample.get
 
+import java.time._, temporal._, cats.free._, cats.implicits._
+import tube.dataloader.core.generator.DateTimeGenerators._
 import io.circe._, syntax._, tube.dataloader.codec.JsonCodec._
 
 channels.asJson

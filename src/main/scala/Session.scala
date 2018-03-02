@@ -42,6 +42,25 @@ object Session {
     }
   }
 
+  def apply(messageGens: cats.data.NonEmptyList[List[org.scalacheck.Gen[MessageTypes]]])(chunkSize : Int) = {
+    import tube.dataloader.models.pure
+
+    val messages : List[org.scalacheck.Gen[MessageTypes]] = messageGens.toList.flatMap(e ⇒ e)
+
+    if (messages.size == chunkSize) {
+      Array(Messages(true, messages.map(generator ⇒ generator.sample.get), None))
+    } else {
+      var page = 0
+      val data =
+        messages.
+          map(generator ⇒ generator.sample.get).
+          sliding(chunkSize, chunkSize).
+          toArray.
+          map(chunk ⇒ { page += 1; Messages(true, chunk, Some(ResponseData(s"$page")))})
+      data.update(data.size - 1, data(data.size - 1).copy(response_metadata = None))
+      data
+    }
+  }
 }
 
 

@@ -2,16 +2,25 @@ package tube.dataloader.models
 
 case class Channels(ok: Boolean, channels: List[Channel], response_metadata: Option[ResponseData])
 
+case class Messages(ok: Boolean, messages: List[MessageTypes], response_metadata: Option[ResponseData])
+
 case class Users(ok: Boolean, offset: String, members: List[User], cache_ts : String, response_metadata: Option[ResponseData])
+
+case class TeamData(ok: Boolean, team : Team) 
 
 case class Team(
   id : String,
   name: String,
   domain: String,
   email_domain : String,
-  image_132 : String,
-  emojis : List[Emoji]
+  enterprise_id : String, 
+  enterprise_name : String,
+  icon : Icon
 )
+
+case class Icon( image_34 : String, image_44 : String, image_default : Boolean, image_132 : String = "https://a.slack-edge.com/0180/img/slackbot_72.png")
+
+case class EmojiData(ok : Boolean, emoji : Emoji)
 
 case class Emoji(name : String, image: String)
 
@@ -29,7 +38,7 @@ case class Channel(id : String,
   is_member : Boolean,
   is_private : Boolean,
   is_mpim : Boolean,
-  members : List[User],
+  members : List[String],
   topic : Topic,
   purpose : Purpose,
   previous_names : List[String],
@@ -40,24 +49,79 @@ case class Purpose(value: String, creator: String, last_set: Long)
 case class User(
   id : String,
   team_id: String,
+  bot_id : String,
+  user : String,
   name : String,
   deleted : Boolean,
+  is_bot : Boolean,
+  is_owner : Boolean,
+  is_primary_owner : Boolean,
+  is_admin : Boolean,
+  profile : Profile
+)
+
+case class Profile(
   first_name : String,
   real_name : String,
   last_name : String,
   display_name : String,
   email : String,
-  is_bot : Boolean,
   status_text : String,
   status_emoji : String,
   title : String,
   skype : String,
   phone : String,
-  is_owner : Boolean,
-  is_primary_owner : Boolean,
-  image_72 : String,
-  is_admin : Boolean,
-  bot_id : String,
-  user : String
+  image_72 : String
 )
 
+case class BotAttachment(
+  fallback : String,
+  text : String,
+  pretext : String,
+  id : Long,
+  color : String,
+  mrkdwn_in : List[String]
+)
+
+case class BotAttachmentMessage(
+  `type`: String,
+  user: String = "",
+  bot_id: String,
+  text: String,
+  attachments: List[BotAttachment],
+  ts: String,
+  reactions: List[Reaction],
+  replies: List[Reply])
+
+case class UserAttachmentMessage(
+  `type`: String,
+  user: String,
+  text: String,
+  attachments: List[io.circe.Json],
+  ts: String,
+  reactions: List[Reaction],
+  replies: List[Reply])
+
+case class Reaction(
+  name : String,
+  users: List[String]
+)
+
+case class Reply(ts: String, user: String)
+
+case class UserFileShareMessage(
+  `type`: String,
+  subtype: String,
+  text : String,
+  file : io.circe.Json,
+  comments : List[UserFileComment], 
+  user : String,
+  bot_id : String,
+  ts: String
+)
+
+case class UserFileComment(
+  id : String,
+  timestamp : Long,
+  user : String
+)
