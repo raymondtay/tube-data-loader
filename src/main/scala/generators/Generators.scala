@@ -50,15 +50,13 @@ object Generators extends Limits {
 
   def genUserId : Gen[String] = for {
     a ← arbitrary[Int].retryUntil(_ > 0)
-    b ← arbitrary[Char].retryUntil(Character.isDefined(_))
-    c ← arbitrary[Int].retryUntil(_ > 0)
-  } yield s"U${a}${b}${c}MQT"
+    b ← arbitrary[Int].retryUntil(_ > 0)
+  } yield s"U${a}${b}MQT"
 
   def genBotUserId : Gen[String] = for {
     a ← arbitrary[Int].retryUntil(_ > 0)
-    b ← arbitrary[Char].retryUntil(Character.isDefined(_))
-    c ← arbitrary[Int].retryUntil(_ > 0)
-  } yield s"BOT${a}${b}${c}MQT"
+    b ← arbitrary[Int].retryUntil(_ > 0)
+  } yield s"BOT${a}${b}MQT"
 
   def genChannelId : Gen[String] = for {
     a ← arbitrary[Int].retryUntil(_ > 0)
@@ -159,12 +157,15 @@ object Generators extends Limits {
     purpose ← genPurpose
   } yield Channel(id, name, isChannel, created, "SlackAdmin", isArchived, isGeneral, name, isShared, isOrgShared, isMember, isPrivate, isMpim, members.map(_.id).to[List], topic, purpose, Nil, members.size )
 
-  val unicodeChar: Gen[Char] = Gen.oneOf((Char.MinValue to Char.MaxValue).filter(Character.isDefined(_)))
+  // The JVM ecosystem can deal with the unicode characters but when
+  // transported over to Cerebro (which is written in Python), additional
+  // supported is needed to deal with unicode. Commenting out the
+  // functionality.
+  // val unicodeChar: Gen[Char] = Gen.oneOf((Char.MinValue to Char.MaxValue).filter(Character.isDefined(_)))
 
   def genEmoji2 = for {
     name ← alphaStr
-    image ← unicodeChar
-  } yield Emoji(name, image+"")
+  } yield Emoji(name, "https://my.slack.com/emoji/bowtie/46ec6f2bb0.png")
 
   def genTeam = for {
     id ← genTeamId
