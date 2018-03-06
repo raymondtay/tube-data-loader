@@ -50,6 +50,8 @@ object JsonCodec {
   implicit val userFileShareEncoder : Encoder[UserFileShareMessage] = deriveEncoder[UserFileShareMessage]
   implicit val userAttMsgEncoder : Encoder[UserAttachmentMessage] = deriveEncoder[UserAttachmentMessage]
   implicit val botAttMsgEncoder : Encoder[BotAttachmentMessage] = deriveEncoder[BotAttachmentMessage]
+  implicit val userFileShareCommentEncoder : Encoder[UserFileShareCommentMessage] = deriveEncoder[UserFileShareCommentMessage]
+  implicit val botPlainMsgEncoder : Encoder[PlainBotMessage] = deriveEncoder[PlainBotMessage]
   implicit val messageEncoder : Encoder[MessageTypes] = new Encoder[MessageTypes] {
     final def apply(a: MessageTypes) : Json = {
       import tube.dataloader.models.extract

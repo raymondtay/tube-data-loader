@@ -83,8 +83,17 @@ case class BotAttachment(
   mrkdwn_in : List[String]
 )
 
+case class PlainBotMessage(
+  `type`: String,
+  subtype : String,
+  username : String,
+  text: String,
+  ts : String
+)
+
 case class BotAttachmentMessage(
   `type`: String,
+  subtype : String,
   user: String = "",
   bot_id: String,
   text: String,
@@ -104,7 +113,8 @@ case class UserAttachmentMessage(
 
 case class Reaction(
   name : String,
-  users: List[String]
+  users: List[String],
+  count : Int
 )
 
 case class Reply(ts: String, user: String)
@@ -114,9 +124,10 @@ case class UserFileShareMessage(
   subtype: String,
   text : String,
   file : io.circe.Json,
-  comments : List[UserFileComment], 
   user : String,
+  username: String,
   bot_id : String,
+  display_as_bot : Boolean,
   ts: String
 )
 
@@ -125,3 +136,14 @@ case class UserFileComment(
   timestamp : Long,
   user : String
 )
+
+case class UserFileShareCommentMessage(
+  `type` : String,
+  subtype : String,
+  text : String,
+  file : io.circe.Json,
+  comment : UserFileComment,
+  is_intro : Boolean,
+  ts : String
+)
+

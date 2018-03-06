@@ -78,5 +78,61 @@ object RawJson {
        "name" : "Image uploaded from iOS.jpg"
     }
     """).getOrElse(Json.Null)
+
+  val filecomments = parse("""
+  "file": {
+      "id": "F92N0BLHJ",
+      "created": 1517547101,
+      "timestamp": 1517547101,
+      "name": "Image uploaded from iOS.jpg",
+      "title": "My attempt on the green tea latte :joy:",
+      "mimetype": "image/jpeg",
+      "filetype": "jpg",
+      "pretty_type": "JPEG",
+      "user": "U8M0NV2H2",
+      "editable": false,
+      "size": 6187953,
+      "mode": "hosted",
+      "is_external": false,
+      "external_type": "",
+      "is_public": true,
+      "public_url_shared": false,
+      "display_as_bot": false,
+      "username": "",
+      "url_private": "https://files.slack.com/files-pri/T024Z5MQM-F92N0BLHJ/image_uploaded_from_ios.jpg",
+      "url_private_download": "https://files.slack.com/files-pri/T024Z5MQM-F92N0BLHJ/download/image_uploaded_from_ios.jpg",
+      "thumb_64": "https://files.slack.com/files-tmb/T024Z5MQM-F92N0BLHJ-4167d81090/image_uploaded_from_ios_64.jpg",
+      "thumb_80": "https://files.slack.com/files-tmb/T024Z5MQM-F92N0BLHJ-4167d81090/image_uploaded_from_ios_80.jpg",
+      "thumb_360": "https://files.slack.com/files-tmb/T024Z5MQM-F92N0BLHJ-4167d81090/image_uploaded_from_ios_360.jpg",
+      "thumb_360_w": 270,
+      "thumb_360_h": 360,
+      "thumb_480": "https://files.slack.com/files-tmb/T024Z5MQM-F92N0BLHJ-4167d81090/image_uploaded_from_ios_480.jpg",
+      "thumb_480_w": 360,
+      "thumb_480_h": 480,
+      "thumb_160": "https://files.slack.com/files-tmb/T024Z5MQM-F92N0BLHJ-4167d81090/image_uploaded_from_ios_160.jpg",
+      "thumb_720": "https://files.slack.com/files-tmb/T024Z5MQM-F92N0BLHJ-4167d81090/image_uploaded_from_ios_720.jpg",
+      "thumb_720_w": 540,
+      "thumb_720_h": 720,
+      "thumb_800": "https://files.slack.com/files-tmb/T024Z5MQM-F92N0BLHJ-4167d81090/image_uploaded_from_ios_800.jpg",
+      "thumb_800_w": 800,
+      "thumb_800_h": 1067,
+      "thumb_960": "https://files.slack.com/files-tmb/T024Z5MQM-F92N0BLHJ-4167d81090/image_uploaded_from_ios_960.jpg",
+      "thumb_960_w": 720,
+      "thumb_960_h": 960,
+      "thumb_1024": "https://files.slack.com/files-tmb/T024Z5MQM-F92N0BLHJ-4167d81090/image_uploaded_from_ios_1024.jpg",
+      "thumb_1024_w": 768,
+      "thumb_1024_h": 1024,
+      "image_exif_rotation": 1,
+      "original_w": 3024,
+      "original_h": 4032,
+      "permalink": "https://nugit.slack.com/files/U8M0NV2H2/F92N0BLHJ/image_uploaded_from_ios.jpg",
+      "permalink_public": "https://slack-files.com/T024Z5MQM-F92N0BLHJ-e62166f5b9",
+      "channels": [
+      "C024Z5MQT"
+      ],
+      "groups": [],
+      "ims": [],
+  }
+  """).getOrElse(Json.Null)
 }
 

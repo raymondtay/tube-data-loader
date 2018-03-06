@@ -212,7 +212,7 @@ object Generators extends Limits {
     for {
       name ← alphaNumStr
       users ← pick(_users.size, _users)
-    } yield Reaction(name, _users.map(_.id))
+    } yield Reaction(name, _users.map(_.id), users.size)
   }
 
   // For a given timestamp, generate 1 file comment
@@ -221,11 +221,34 @@ object Generators extends Limits {
     id ← alphaNumStr
   } yield UserFileComment(id, ts.toEpochSecond(ZoneOffset.UTC), user.id)
 
+  def genFileCommentMessage(user: User)(ts : LocalDateTime) = for {
+    text ← alphaStr
+    fileComment ← listOfN(1, genFileComment(user::Nil)(ts))
+    is_intro ← genBoolean
+  } yield UserFileShareCommentMessage("message", "file_comment", text, file = RawJson.fileshared, fileComment.head, is_intro, ts.toEpochSecond(ZoneOffset.UTC).toString) map pure
+
   // For a given timestamp, generate 1 reply
   def genReply(users: List[User], ts: LocalDateTime) = for {
     user ← oneOf(users)
-  } yield Reply(user.id, ts.toEpochSecond(ZoneOffset.UTC).toString)
+  } yield Reply(ts.toEpochSecond(ZoneOffset.UTC).toString, user.id)
 
+  // Bot messages with no attachments, no reactions, no replies, just bot
+  // messages e.g. 
+  // {
+  //   "text": "Hello. Another new user going by the name of Priscilla (<mailto:priscilla@nugit.co|priscilla@nugit.co>) has passed through the Nugit gates. We've also added them to Mailchimp's Nugit Users list.  ",
+  //   "username": "Zapier",
+  //   "bot_id": "B0VD275DX",
+  //   "type": "message",
+  //   "subtype": "bot_message",
+  //   "ts": "1520233018.000176"
+  //   }
+  def genPlainBotMessage(team: Team)
+                   (botUser : User)
+                   (ts: LocalDateTime) =
+  for {
+    text ← alphaStr
+  } yield PlainBotMessage("message", subtype = "bot_message", botUser.name, text, ts.toEpochSecond(ZoneOffset.UTC).toString) map pure
+ 
   // For a given timestamp, this function generates a message depending on
   // whether its a bot; which carries not only an attachment but also reactions
   // and replies to that attachment
@@ -237,12 +260,11 @@ object Generators extends Limits {
                    (repliesThreshold: Int) // maximum number of replies to generate
                    (ts : LocalDateTime) =
     for {
-      subtpe ← oneOf(slackMessageTypes.toList)
       text ← alphaStr
       attachments ← listOfN(choose(1, attachmentThreshold).sample.get, genBotAttachment)
       reactions ← listOfN(choose(1, reactionThreshold).sample.get, genReaction(genUser(team)))
       replies ← listOfN(choose(1, repliesThreshold).sample.get, genReply(users, ts))
-    } yield BotAttachmentMessage("message", user = "", botUser.id, text, attachments, ts.toEpochSecond(ZoneOffset.UTC).toString, reactions, replies) map pure
+    } yield BotAttachmentMessage("message", "bot_message", user = "", botUser.id, text, attachments, ts.toEpochSecond(ZoneOffset.UTC).toString, reactions, replies) map pure
 
   // For a given timestamp, this function generates a message for a non-bot
   // user; which carries 1 attachment and reactions and replies to that
@@ -268,8 +290,7 @@ object Generators extends Limits {
                          (ts : LocalDateTime) = for {
       user ← oneOf(users)
       text ← alphaStr
-      comments ← listOfN(commentsThreshold, genFileComment(users)(ts))
-    } yield UserFileShareMessage("message", "file_share", text, RawJson.fileshared, comments, user.id, if(user.is_bot) user.bot_id else "", ts.toEpochSecond(ZoneOffset.UTC).toString) map pure
+  } yield UserFileShareMessage("message", "file_share", text, RawJson.fileshared, user.id, user.name, if(user.is_bot) user.bot_id else "", false, ts.toEpochSecond(ZoneOffset.UTC).toString) map pure
 
 
   /**
@@ -299,14 +320,17 @@ object Generators extends Limits {
     import tube.dataloader.codec.JsonCodec._
 
     val botUsers = users.filter(_.is_bot == true)
+    val nonBotUsers = users.filter(_.is_bot == false)
 
     for {
       genbotUsers            ← pick(choose(1, botUsers.size).sample.get, botUsers)
+      plainbotMessages       ← listOfN(maxBotMessagesPerTS, genPlainBotMessage(team)(genbotUsers.sample.get.head)(ts))
       botMessages            ← listOfN(maxBotMessagesPerTS, genBotMessage(team)(users)(genbotUsers.sample.get.head)(attachmentThreshold)(reactionThreshold)(repliesThreshold)(ts))
-      userAttachmentMessages ← listOfN(maxUserAttachMessagesPerTS, genUserAttachmentMessage(team)(users)(attachmentThreshold)(reactionThreshold)(repliesThreshold)(ts))
-      fileShareMessages      ← listOfN(maxFileShareMessagesPerTS, genFileShareMessage(team)(users)(commentsThreshold)(ts))
+      userAttachmentMessages ← listOfN(maxUserAttachMessagesPerTS, genUserAttachmentMessage(team)(nonBotUsers)(attachmentThreshold)(reactionThreshold)(repliesThreshold)(ts))
+      fileShareMessages      ← listOfN(maxFileShareMessagesPerTS, genFileShareMessage(team)(nonBotUsers)(commentsThreshold)(ts))
+      fileShareComments      ← listOfN(maxFileShareMessagesPerTS, genFileCommentMessage(nonBotUsers.sample.get.head)(ts))
     } yield {
-      botMessages ++ userAttachmentMessages ++ fileShareMessages
+      botMessages ++ userAttachmentMessages ++ fileShareMessages ++ fileShareComments
     }
   }
 
