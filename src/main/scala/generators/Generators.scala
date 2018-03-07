@@ -69,13 +69,11 @@ object Generators extends Limits {
 
   def genTopic : Gen[Topic] = for {
     v ← alphaNumStr
-    lastSet ← arbitrary[Long]
-  } yield Topic(v, "SlackAdmin", lastSet)
+  } yield Topic(v, "SlackAdmin", 0)
 
   def genPurpose : Gen[Purpose] = for {
     v ← alphaNumStr
-    lastSet ← arbitrary[Long]
-  } yield Purpose(v, "SlackAdmin", lastSet)
+  } yield Purpose(v, "SlackAdmin", 0)
 
   def genFirstName : Gen[String] = oneOf(firstnames)
 
